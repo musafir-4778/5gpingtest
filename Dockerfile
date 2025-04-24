@@ -16,10 +16,9 @@ WORKDIR /app
 # Copy all app files
 COPY --from=builder /app /app
 
-# 🔽 Explicitly add the mp4 file
-COPY 1080.mp4 ./1080.mp4
+# ✅ Copy videos folder into container
+COPY videos ./videos
 
-# Install only production dependencies
 RUN npm install --omit=dev
 
 EXPOSE 3000
