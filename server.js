@@ -33,11 +33,11 @@ app.post("/logPing", (req, res) => {
   console.log(req.body);
   res.status(200).json({ message: "Data received" });
 });
-
-// Get file size
+// File size
 app.get('/download-file-size', (req, res) => {
   try {
-    const stat = fs.statSync("1080.mp4");
+    const filePath = path.join(__dirname, '1080.mp4');
+    const stat = fs.statSync(filePath);
     res.json({ fileSize: stat.size });
   } catch (error) {
     console.error("Error getting file size:", error);
@@ -45,10 +45,10 @@ app.get('/download-file-size', (req, res) => {
   }
 });
 
-// Stream file download
+// File stream
 app.get('/download', (req, res) => {
-  const filePath = "1080.mp4";
   try {
+    const filePath = path.join(__dirname, '1080.mp4');
     const stat = fs.statSync(filePath);
     res.writeHead(200, {
       'Content-Type': 'application/octet-stream',

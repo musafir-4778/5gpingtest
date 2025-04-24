@@ -1,26 +1,18 @@
-# ---------- Stage 1: Build Frontend ----------
-    FROM node:18-alpine AS builder
-
-    WORKDIR /app
-    
-    # Install dependencies and build frontend
-    COPY package*.json ./
-    RUN npm install
-    COPY . .
-    RUN npm run build
- # ---------- Stage 2: Serve with Express ----------
+# Use a base Node image
 FROM node:18-alpine
 
+# Create app directory
 WORKDIR /app
 
-# Copy all app files
-COPY --from=builder /app /app
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
 
-# ✅ Copy videos folder into container
-COPY videos ./videos
+# Copy everything else
+COPY . .
 
-RUN npm install --omit=dev
-
+# Expose the port your server listens on
 EXPOSE 3000
 
+# Start the server
 CMD ["node", "server.js"]
