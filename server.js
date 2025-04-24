@@ -5,33 +5,36 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-app.use(cors());
+// Setup __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const hlsBasePath = path.join(__dirname, 'videos/hls');
-app.use('/hls',cors(), express.static(hlsBasePath));
+
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-app.use(express.static("public"));
-// Root route
-// app.get('/', (req, res) => {
-//   res.json({ message: 'Ping test server is running' });
-// });
+// Serve HLS video files
+const hlsBasePath = path.join(__dirname, 'videos/hls');
+app.use('/hls', express.static(hlsBasePath));
 
-// Ping endpoint
+// Serve frontend build
+const distPath = path.join(__dirname, 'dist');
+app.use(express.static(distPath));
+
+// Ping test
 app.get('/ping', (req, res) => {
   res.json({ timestamp: Date.now() });
 });
 
+// Receive ping logs
 app.post("/logPing", (req, res) => {
   console.log(req.body);
   res.status(200).json({ message: "Data received" });
 });
 
-
-// // Endpoint to get the file size
+// Get file size
 app.get('/download-file-size', (req, res) => {
   try {
     const stat = fs.statSync("1080.mp4");
@@ -42,7 +45,7 @@ app.get('/download-file-size', (req, res) => {
   }
 });
 
-// Endpoint to stream the file
+// Stream file download
 app.get('/download', (req, res) => {
   const filePath = "1080.mp4";
   try {
@@ -58,18 +61,19 @@ app.get('/download', (req, res) => {
   }
 });
 
-// Latency test endpoint
+// Latency test
 app.get('/download-ping', (req, res) => {
   res.send('pong');
 });
 
-// Time to First Byte (TTFB) test endpoint
+// TTFB test
 app.get('/download-ttfb', (req, res) => {
   const start = Date.now();
   res.setHeader('Content-Type', 'text/plain');
   res.send(`${Date.now() - start}`);
 });
 
+// List available video resolutions
 app.get('/video/resolutions', (req, res) => {
   fs.readdir(hlsBasePath, { withFileTypes: true }, (err, files) => {
     if (err) return res.status(500).json({ error: 'Could not read folder' });
@@ -83,8 +87,12 @@ app.get('/video/resolutions', (req, res) => {
   });
 });
 
+// Serve frontend app (React SPA support)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
+});
 
-// Error handling middleware
+// 404 and error handlers
 app.use((req, res) => {
   res.status(404).json({ error: 'Not Found' });
 });
@@ -94,7 +102,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+// Start server (external access enabled)
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${port}`);
 });
