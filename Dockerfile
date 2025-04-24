@@ -1,33 +1,28 @@
-# --------- Stage 1: Build React Frontend with Vite ----------
-    FROM node:18-alpine as build
+# ---------- Stage 1: Build Frontend ----------
+    FROM node:18-alpine AS builder
 
     WORKDIR /app
     
-    # Copy and install dependencies
+    # Install dependencies and build frontend
     COPY package*.json ./
     RUN npm install
-    
-    # Copy all files and build frontend
     COPY . .
     RUN npm run build
     
-    # --------- Stage 2: Run Express Server ----------
+    # ---------- Stage 2: Run Express Server ----------
     FROM node:18-alpine
     
     WORKDIR /app
     
-    # Copy app and build artifacts
-    COPY --from=build /app /app
+    # Copy everything including server.js, videos, etc.
+    COPY --from=builder /app /app
     
-    # Install only production deps
+    # Reinstall only production deps
     RUN npm install --omit=dev
     
-    # Expose port
+    # Expose port (important for Railway/Render)
     EXPOSE 3000
     
-    # Enable ES Modules
-    ENV NODE_ENV=production
-    
-    # Start the Express server
+    # Start Express server (will serve dist/ too)
     CMD ["node", "server.js"]
     
