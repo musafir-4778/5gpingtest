@@ -8,21 +8,20 @@
     RUN npm install
     COPY . .
     RUN npm run build
-    
-    # ---------- Stage 2: Run Express Server ----------
-    FROM node:18-alpine
-    
-    WORKDIR /app
-    
-    # Copy everything including server.js, videos, etc.
-    COPY --from=builder /app /app
-    
-    # Reinstall only production deps
-    RUN npm install --omit=dev
-    
-    # Expose port (important for Railway/Render)
-    EXPOSE 3000
-    
-    # Start Express server (will serve dist/ too)
-    CMD ["node", "server.js"]
-    
+ # ---------- Stage 2: Serve with Express ----------
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy all app files
+COPY --from=builder /app /app
+
+# 🔽 Explicitly add the mp4 file
+COPY 1080.mp4 ./1080.mp4
+
+# Install only production dependencies
+RUN npm install --omit=dev
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]
