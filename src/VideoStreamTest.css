@@ -1,0 +1,43 @@
+/* VideoStramTest.css */
+
+.container {
+  padding: 2rem;
+  font-family: sans-serif;
+}
+
+.header {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.button-group {
+  margin-bottom: 1rem;
+}
+
+.res-button {
+  margin-right: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #faefef;
+  color: #000;
+}
+
+.res-button.active {
+  background-color: #1976d2;
+  color: #fff;
+}
+
+.video-player {
+  width: 800px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.select-text {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #444;
+}
